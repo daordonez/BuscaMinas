@@ -5,6 +5,7 @@ public class BuscaMinas {
 
     // Estado en el que se encuentra la partida --> 0 = jugando, 1 = perdido, 2 = ganado;
     public static final int ESTADO = 0; 
+    public static final char LUG = '_';
 
     //Cantidad de casillas vistas
     public static int cvistas = 0;
@@ -23,7 +24,11 @@ public class BuscaMinas {
         
         //Tableros de juego
        int tablero[][] = new int[dim[0]][dim[1]];
-       int visible[][] = new int[dim[0]][dim[1]];
+       char visible[][] = new char[dim[0]][dim[1]];
+       
+        initTab(visible, tablero);
+        
+        muesTab(visible);
 
     }
 
@@ -79,18 +84,25 @@ public class BuscaMinas {
      * Muestra contenido de la matriz que se le pase por parametro, no sustituye caracteres
      * @param tab - Matriz a mostrar
      */
-    public static void muesTab(int tab[][]){
+    public static void muesTab(char tab[][]){
         for (int fi = 0; fi < tab.length; fi++) {
             for (int co = 0; co < tab[0].length; co++) {
-                System.out.print(tab[fi][co]);
+                System.out.print(tab[fi][co]+"|");
             }
-            System.out.println();
+            System.out.println(" "+fi);
         }
     }
-    public static void initTab(int vis[][],int tab[][],int caMin[]){
-        for (int[] fil : tab) {
+    /**
+     * Inicializa ambos tableros a ceros declarando la partida como acaba de comenzar
+     * @param vis - Tablero visible de la partida
+     * @param tab - Tablero con valores, minas y numeros alrededor;
+     */
+    public static void initTab(char vis[][],int tab[][]){
+        for (int fil = 0; fil < tab.length; fil++) {
             for (int col = 0; col < tab[0].length; col++) {
-                vis[]
+                tab[fil][col] = 0;
+                //Todas las casillas tapadas
+                vis[fil][col] = LUG;
             }
         }
     }
