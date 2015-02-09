@@ -6,6 +6,7 @@ public class BuscaMinas {
     // Estado en el que se encuentra la partida --> 0 = jugando, 1 = perdido, 2 = ganado;
     public static final int ESTADO = 0; 
     public static final char LUG = '_';
+    public static final char BMB = 'X';
 
     //Cantidad de casillas vistas
     public static int cvistas = 0;
@@ -23,12 +24,16 @@ public class BuscaMinas {
         int dim[] = creaTabs(sel);
         
         //Tableros de juego
-       int tablero[][] = new int[dim[0]][dim[1]];
-       char visible[][] = new char[dim[0]][dim[1]];
+       char tablero[][] = new char[dim[0] + 1][dim[1] + 1];
+       char visible[][] = new char[dim[0] + 1][dim[1] + 1];
        
         initTab(visible, tablero);
         
         muesTab(visible);
+        
+        minadoTab(tablero, dim);
+        
+        muesTab(tablero);
 
     }
 
@@ -55,6 +60,7 @@ public class BuscaMinas {
      */
     public static int[] creaTabs(int slc) {
         //Vector con dimensiones
+        
         int[] dimTab = new int[3];
 
         switch (slc) {
@@ -85,8 +91,14 @@ public class BuscaMinas {
      * @param tab - Matriz a mostrar
      */
     public static void muesTab(char tab[][]){
-        for (int fi = 0; fi < tab.length; fi++) {
-            for (int co = 0; co < tab[0].length; co++) {
+        System.out.print("    ");//4Espacios
+        for (int i = 1; i < tab[0].length; i++) {
+            System.out.printf("%-2d",i);
+        }
+        System.out.println();
+        for (int fi = 1; fi < tab.length; fi++) {
+            System.out.printf("%-3d|",fi);
+            for (int co = 1; co < tab[0].length; co++) {
                 System.out.print(tab[fi][co]+"|");
             }
             System.out.println(" "+fi);
@@ -97,13 +109,30 @@ public class BuscaMinas {
      * @param vis - Tablero visible de la partida
      * @param tab - Tablero con valores, minas y numeros alrededor;
      */
-    public static void initTab(char vis[][],int tab[][]){
+    public static void initTab(char vis[][],char tab[][]){
         for (int fil = 0; fil < tab.length; fil++) {
             for (int col = 0; col < tab[0].length; col++) {
-                tab[fil][col] = 0;
+                tab[fil][col] = LUG;
                 //Todas las casillas tapadas
                 vis[fil][col] = LUG;
             }
         }
+    }
+    
+    public static void minadoTab(char tab[][], int cBomb[]){
+    
+        
+        int fil = cBomb[0];
+        int col = cBomb[1];
+        int cntBomb = cBomb[2];
+        int aleFi,aleCo;
+        
+        do {            
+            aleFi = (int)(Math.random()*(fil - 1));
+            aleCo = (int)(Math.random()*(col - 1));
+            tab[aleFi][aleCo] = BMB;
+            cntBomb--;
+        } while (cntBomb > 0 && tab[aleFi][aleCo] == BMB);
+        
     }
 }
