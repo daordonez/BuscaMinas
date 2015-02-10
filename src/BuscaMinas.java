@@ -34,6 +34,13 @@ public class BuscaMinas {
         minadoTab(tablero, dim);
         
         muesTab(tablero);
+        
+        infoUs("Introduzca fila:");
+        int filUs = teclado.nextInt();
+        infoUs("Introduzca columna:");
+        int colUs = teclado.nextInt();
+        
+        
 
     }
 
@@ -118,7 +125,6 @@ public class BuscaMinas {
             }
         }
     }
-    
     public static void minadoTab(char tab[][], int cBomb[]){
     
         
@@ -134,5 +140,14 @@ public class BuscaMinas {
             cntBomb--;
         } while (cntBomb > 0 && tab[aleFi][aleCo] == BMB);
         
+    }
+    public static void destAlr(char tab[][],char vis[][],int fil, int col){
+        if (tab[fil][col] == BMB) {
+            return 
+        }
+    }
+    public static int contBmbAlr(int fil, int col){
+        int totalBmb;
+        return totalBmb;
     }
 }
