@@ -1,4 +1,5 @@
 
+import java.awt.Dimension;
 import java.util.Scanner;
 
 public class BuscaMinas {
@@ -7,6 +8,7 @@ public class BuscaMinas {
     public static final int ESTADO = 0; 
     public static final char LUG = '_';
     public static final char BMB = 'X';
+    public static final char BND = 'P';
 
     //Cantidad de casillas vistas
     public static int cvistas = 0;
@@ -24,7 +26,7 @@ public class BuscaMinas {
         int dim[] = creaTabs(sel);
         
         //Tableros de juego
-       char tablero[][] = new char[dim[0] + 1][dim[1] + 1];
+       boolean tablero[][] = new boolean[dim[0] + 1][dim[1] + 1];
        char visible[][] = new char[dim[0] + 1][dim[1] + 1];
        
         initTab(visible, tablero);
@@ -33,17 +35,55 @@ public class BuscaMinas {
         
         minadoTab(tablero, dim);
         
-        muesTab(tablero);
+        int salir = 0;
+        do {            
+            infoUs("¿Qué dese hacer ahora?");
+            System.out.println("1. Destapar");
+            System.out.println("2. Poner/Quitar Bandera (P)");
+            System.out.println("3. Finalizar juego");
+            int opc = teclado.nextInt();
+
+            switch (opc) {
+                case 1:
+                    
+                    infoUs("Introduzca fila:");
+                    int fi1 = teclado.nextInt();
+                    infoUs("Introduzca columna:");
+                    int co1 = teclado.nextInt();
+                            
+
+                    break;
+                case 2:
+                    infoUs("Introduzca fila:");
+                    int fi2 = teclado.nextInt();
+                    infoUs("Introduzca columna:");
+                    int co2 = teclado.nextInt();
+                    
+                    ponerBand(fi2, co2, visible, dim);
+
+                    break;
+                case 3:
+                    salir = 1;
+                    break;
+                default:
+                    System.err.println("Opción incorrecta");
+            }
+        } while (salir != 1);
         
-        infoUs("Introduzca fila:");
-        int filUs = teclado.nextInt();
-        infoUs("Introduzca columna:");
-        int colUs = teclado.nextInt();
+        
         
         
 
     }
 
+    public static void ponerBand(int fil,int col,char vis[][],int dim[]){
+        //Posición correcta
+        if (correctaSN(fil, col, dim)) {
+            vis[fil][col] = BND;
+        }else if (vis[fil][col] == BND) {
+            vis[fil][col] = LUG;
+        }
+    }
     public static void infoUs(String mensaje) {
         for (int i = 0; i < 15; i++) {
             System.out.print("*");
@@ -116,16 +156,16 @@ public class BuscaMinas {
      * @param vis - Tablero visible de la partida
      * @param tab - Tablero con valores, minas y numeros alrededor;
      */
-    public static void initTab(char vis[][],char tab[][]){
+    public static void initTab(char vis[][],boolean tab[][]){
         for (int fil = 0; fil < tab.length; fil++) {
             for (int col = 0; col < tab[0].length; col++) {
-                tab[fil][col] = LUG;
+                tab[fil][col] = false;
                 //Todas las casillas tapadas
                 vis[fil][col] = LUG;
             }
         }
     }
-    public static void minadoTab(char tab[][], int cBomb[]){
+    public static void minadoTab(boolean tab[][], int cBomb[]){
     
         
         int fil = cBomb[0];
@@ -136,18 +176,62 @@ public class BuscaMinas {
         do {            
             aleFi = (int)(Math.random()*(fil - 1));
             aleCo = (int)(Math.random()*(col - 1));
-            tab[aleFi][aleCo] = BMB;
+            tab[aleFi][aleCo] = true;
             cntBomb--;
-        } while (cntBomb > 0 && tab[aleFi][aleCo] == BMB);
+        } while (cntBomb > 0 && tab[aleFi][aleCo] == true);
         
     }
-    public static void destAlr(char tab[][],char vis[][],int fil, int col){
-        if (tab[fil][col] == BMB) {
-            return 
+    //Recursiva
+    public static void destapar(boolean tab[][],char vis[][],int fil, int col,int dim[]){
+       //caso base
+        if (correctaSN(fil, col, dim) == false) {
+            
         }
+        
     }
-    public static int contBmbAlr(int fil, int col){
-        int totalBmb;
+    public static int contBmbAlr(int fil, int col, boolean tab[][]){
+        int totalBmb= 0;
+        
+        if (tab[fil -1 ][col] == true) {
+            //f-1,c
+            totalBmb++;
+        }else if (tab[fil - 1 ][col + 1] == true){
+            //f-1,c+1
+            totalBmb++;
+        }else if (tab[fil][col + 1] == true) {
+            //f,c+1
+            totalBmb++;
+        }else if (tab[fil + 1][col + 1] == true) {
+            //f+1,c+1
+            totalBmb++;
+        }else if (tab[fil + 1 ][col] == true) {
+            //f+1,c
+            totalBmb++;
+        }else if (tab[fil + 1 ][col - 1] == true) {
+            //f+1,c-1
+            totalBmb++;
+        }else if (tab[fil][col - 1] == true) {
+            //f,c-1
+            totalBmb++;
+        }else if (tab[fil - 1 ][col - 1] == true) {
+            //f-1,c-1
+            totalBmb++;
+        }
         return totalBmb;
+    }
+    
+    public static boolean correctaSN(int fil, int col,int dim[]) {
+        
+        boolean correcto ;
+        
+        if (fil > dim[0] && col > dim[1]) {
+            correcto = false;
+        }else if (fil <= 0 && col <= 0) {
+            correcto = false;
+        }else{
+            correcto = true;
+        }
+        
+        return correcto;
     }
 }
