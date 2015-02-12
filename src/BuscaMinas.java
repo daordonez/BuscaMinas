@@ -17,6 +17,7 @@ public class BuscaMinas {
 
         Scanner teclado = new Scanner(System.in);
 
+        infoUs("BUSCAMINAS");
         infoUs("1. Nivel principiante --> 8x8 casillas, 10 minas");
         infoUs("2. Nivel intermedio --> 10x10 casillas, 40 minas");
         infoUs("3. Nivel experto --> 16x30 casillas, 99 minas");
@@ -37,10 +38,11 @@ public class BuscaMinas {
         
         int salir = 0;
         do {            
-            infoUs("¿Qué dese hacer ahora?");
+            infoUs("- MENU -");
             System.out.println("1. Destapar");
             System.out.println("2. Poner/Quitar Bandera (P)");
             System.out.println("3. Finalizar juego");
+            System.out.print("¿Qué desea hacer? : ");
             int opc = teclado.nextInt();
 
             switch (opc) {
@@ -60,6 +62,8 @@ public class BuscaMinas {
                     int co2 = teclado.nextInt();
                     
                     ponerBand(fi2, co2, visible, dim);
+                    
+                    muesTab(visible);
 
                     break;
                 case 3:
@@ -79,9 +83,15 @@ public class BuscaMinas {
     public static void ponerBand(int fil,int col,char vis[][],int dim[]){
         //Posición correcta
         if (correctaSN(fil, col, dim)) {
-            vis[fil][col] = BND;
-        }else if (vis[fil][col] == BND) {
-            vis[fil][col] = LUG;
+            //Si ya hay bandera quitala
+            if (vis[fil][col] == BND) {
+                vis[fil][col] = LUG;
+            }else{
+                //Si no hay ponla
+                vis[fil][col] = BND;
+            }
+        }else{
+            infoUs("Posición incorrecta");
         }
     }
     public static void infoUs(String mensaje) {
