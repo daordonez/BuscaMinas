@@ -245,7 +245,9 @@ public class BuscaMinas {
     public static boolean minadoSN(int fil, int col, int dim[], boolean tab[][]){
         boolean minado = false;
         
+        //Comprueba que no se sale de la matriz
         if (correctaSN(fil, col, dim)) {
+            //Si es una bomba retorna true
             if (tab[fil][col] == true) {
                 minado = true;
             }
@@ -257,17 +259,13 @@ public class BuscaMinas {
     }
 
     //Recursiva
-
     public static void destapar(boolean tab[][], char vis[][], int fil, int col, int dim[]) {
         //caso base
-        System.out.println("Entra en func. destapar");
+        
         if (correctaSN(fil, col, dim) && vis[fil][col] == LUG && minadoSN(fil, col, dim, tab) == false) {
 
-            System.out.println("Entra en correcto fun. destapar");
-
             if (contBmbAlr(fil, col, tab,dim) == 0) {
-
-                System.out.println("entra en recursion");
+                
                 vis[fil][col] = DST;
                 destapar(tab, vis, fil, col + 1, dim);
                 destapar(tab, vis, fil, col - 1, dim);
