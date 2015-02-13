@@ -5,8 +5,9 @@ public class BuscaMinas {
 
     // Estado en el que se encuentra la partida --> 0 = jugando, 1 = perdido, 2 = ganado;
     public static final int ESTADO = 0;
-    public static final char LUG = '_';
-    public static final char BMB = 'X';
+    public static final char DST = '_';
+    public static final char LUG = 'X';
+    public static final char BMB = '*';
     public static final char BND = 'P';
 
     //Cantidad de casillas vistas
@@ -31,12 +32,12 @@ public class BuscaMinas {
 
         initTab(visible, tablero);
 
-        muesTab(visible);
-
-        minadoTab(tablero, dim);
+        minarTab(tablero, dim);
 
         int salir = 0;
         do {
+            matrizBool(tablero);
+            muesTab(visible);
             infoUs("- MENU -");
             System.out.println("1. Destapar");
             System.out.println("2. Poner/Quitar Bandera (P)");
@@ -51,6 +52,10 @@ public class BuscaMinas {
                     int fi1 = teclado.nextInt();
                     infoUs("Introduzca columna:");
                     int co1 = teclado.nextInt();
+                    
+                    abrirPos(fi1, co1, tablero, visible, dim);
+                    
+//                    muesTab(visible);
 
                     break;
                 case 2:
@@ -61,7 +66,7 @@ public class BuscaMinas {
 
                     ponerBand(fi2, co2, visible, dim);
 
-                    muesTab(visible);
+//                    muesTab(visible);
 
                     break;
                 case 3:
@@ -93,11 +98,14 @@ public class BuscaMinas {
     public static boolean abrirPos(int fil,int col,boolean tab[][],char vis[][], int dim[]){
         boolean esMina = false;
         
+        //No se sale del tablero
         if (correctaSN(fil, col, dim)) {
-            if (tab[fil][col]) {
+            //Si es una mina devuelve true
+            if (minadoSN(fil, col, dim, tab)) {
                 esMina = true;
             }else{
-                System.out.println("Recursiva");
+                //Si no es empieza recursion
+                destapar(tab, vis, fil, col, dim);
             }
         }else{
             return false;
@@ -196,7 +204,7 @@ public class BuscaMinas {
         }
     }
 
-    public static void minadoTab(boolean tab[][], int cBomb[]) {
+    public static void minarTab(boolean tab[][], int cBomb[]) {
 
         int fil = cBomb[0];
         int col = cBomb[1];
@@ -206,9 +214,11 @@ public class BuscaMinas {
         do {
             aleFi = (int) (Math.random() * (fil - 1));
             aleCo = (int) (Math.random() * (col - 1));
-            tab[aleFi][aleCo] = true;
-            cntBomb--;
-        } while (cntBomb > 0 && tab[aleFi][aleCo] == true);
+            if (minadoSN(fil, col, cBomb, tab) == false) {
+                tab[aleFi][aleCo] = true;
+                cntBomb--;
+            }
+        } while (cntBomb > 0);
 
     }
 
@@ -221,15 +231,12 @@ public class BuscaMinas {
      * @return Valor boleano. True en caso de ser correcto
      */
     public static boolean correctaSN(int fil, int col, int dim[] ) {
+         // quitado redundancia
+        boolean correcto = true;
 
-        boolean correcto;
-
-        if (fil > dim[0] && col > dim[1]) {
+        //Si es mayor o igual
+        if (fil > dim[0] || col > dim[1] || fil <= 0 || col <= 0) {
             correcto = false;
-        } else if (fil <= 0 && col <= 0) {
-            correcto = false;
-        } else {
-            correcto = true;
         }
 
         return correcto;
@@ -239,7 +246,7 @@ public class BuscaMinas {
         boolean minado = false;
         
         if (correctaSN(fil, col, dim)) {
-            if (tab[fil][col]) {
+            if (tab[fil][col] == true) {
                 minado = true;
             }
         }else{
@@ -253,50 +260,79 @@ public class BuscaMinas {
 
     public static void destapar(boolean tab[][], char vis[][], int fil, int col, int dim[]) {
         //caso base
-        if (correctaSN(fil, col, dim) == false) {
+        System.out.println("Entra en func. destapar");
+        if (correctaSN(fil, col, dim) && vis[fil][col] == LUG && minadoSN(fil, col, dim, tab) == false) {
 
-        }else{
-            vis[fil][col]= (char)contBmbAlr(fil, col, tab);
-            destapar(tab, vis, fil, col + 1, dim);
-            destapar(tab, vis, fil, col - 1, dim);
-            destapar(tab, vis, fil - 1, col, dim);
-            destapar(tab, vis, fil + 1, col, dim);
-            destapar(tab, vis, fil + 1, col + 1, dim);
-            destapar(tab, vis, fil + 1, col - 1, dim);
-            destapar(tab, vis, fil - 1, col + 1, dim);
-            destapar(tab, vis, fil - 1, col + 1, dim);
+            System.out.println("Entra en correcto fun. destapar");
+
+            if (contBmbAlr(fil, col, tab,dim) == 0) {
+
+                System.out.println("entra en recursion");
+                vis[fil][col] = DST;
+                destapar(tab, vis, fil, col + 1, dim);
+                destapar(tab, vis, fil, col - 1, dim);
+                destapar(tab, vis, fil - 1, col, dim);
+                destapar(tab, vis, fil + 1, col, dim);
+                destapar(tab, vis, fil + 1, col + 1, dim);
+                destapar(tab, vis, fil + 1, col - 1, dim);
+                destapar(tab, vis, fil - 1, col + 1, dim);
+                destapar(tab, vis, fil - 1, col + 1, dim);
+            } else {
+                System.out.println("Cantidad minas adyacentes");
+                vis[fil][col] = (contBmbAlr(fil, col, tab,dim) + " ").charAt(0);
+            }
         }
     }
 
-    public static int contBmbAlr(int fil, int col, boolean tab[][]) {
+    public static int contBmbAlr(int fil, int col, boolean tab[][],int dim[]) {
         int totalBmb = 0;
 
-        if (tab[fil - 1][col] == true) {
+        if (minadoSN( fil -1, col, dim, tab) == true) {
             //f-1,c
             totalBmb++;
-        } else if (tab[fil - 1][col + 1] == true) {
+        } else if (minadoSN( fil - 1, col + 1, dim, tab) == true) {
             //f-1,c+1
             totalBmb++;
-        } else if (tab[fil][col + 1] == true) {
+        } else if (minadoSN(fil, col + 1, dim, tab) == true) {
             //f,c+1
             totalBmb++;
-        } else if (tab[fil + 1][col + 1] == true) {
+        } else if (minadoSN(fil + 1, col + 1, dim, tab) == true) {
             //f+1,c+1
             totalBmb++;
-        } else if (tab[fil + 1][col] == true) {
+        } else if (minadoSN(fil + 1, col, dim, tab) == true) {
             //f+1,c
             totalBmb++;
-        } else if (tab[fil + 1][col - 1] == true) {
+        } else if (minadoSN(fil + 1, col - 1, dim, tab) == true) {
             //f+1,c-1
             totalBmb++;
-        } else if (tab[fil][col - 1] == true) {
+        } else if (minadoSN(fil, col -1, dim, tab) == true) {
             //f,c-1
             totalBmb++;
-        } else if (tab[fil - 1][col - 1] == true) {
+        } else if (minadoSN(fil - 1, col - 1, dim, tab) == true) {
             //f-1,c-1
             totalBmb++;
         }
         return totalBmb;
+    }
+    
+    public static void matrizBool(boolean matriz[][]){
+        
+        System.out.print("    ");//4Espacios
+        for (int i = 1; i < matriz[0].length; i++) {
+            System.out.printf("%-2d", i);
+        }
+        System.out.println("");
+        for (int i = 0; i < matriz.length; i++) {
+            System.out.printf("%-3d|", i);
+            for (int j = 0; j < matriz[0].length; j++) {
+                if (matriz[i][j] == true) {
+                    System.out.print(BMB+"|");
+                }else{
+                    System.out.print(DST+"|");
+                }
+            }
+            System.out.println(" "+i);
+        }
     }
 
 }
