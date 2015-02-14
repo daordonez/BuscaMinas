@@ -10,8 +10,6 @@ public class BuscaMinas {
     public static final char BMB = '*';
     public static final char BND = 'P';
 
-    //Cantidad de casillas vistas
-    public static int cvistas = 0;
 
     public static void main(String[] args) {
 
@@ -34,10 +32,15 @@ public class BuscaMinas {
 
         minarTab(tablero, dim);
 
-        int salir = 0;
+        boolean salir = false;
+        boolean victoria;
+        
         do {
+            
+            //Visualiza ubicación bombas, descomentar para ver
             matrizBool(tablero);
             muesTab(visible);
+            
             infoUs("- MENU -");
             System.out.println("1. Destapar");
             System.out.println("2. Poner/Quitar Bandera (P)");
@@ -45,6 +48,7 @@ public class BuscaMinas {
             System.out.print("¿Qué desea hacer? : ");
             int opc = teclado.nextInt();
 
+            boolean bomba = false;
             switch (opc) {
                 case 1:
 
@@ -53,8 +57,7 @@ public class BuscaMinas {
                     infoUs("Introduzca columna:");
                     int co1 = teclado.nextInt();
                     
-                    abrirPos(fi1, co1, tablero, visible, dim);
-                    
+                    bomba = abrirPos(fi1, co1, tablero, visible, dim);                
 //                    muesTab(visible);
 
                     break;
@@ -65,21 +68,38 @@ public class BuscaMinas {
                     int co2 = teclado.nextInt();
 
                     ponerBand(fi2, co2, visible, dim);
-
 //                    muesTab(visible);
 
                     break;
                 case 3:
-                    salir = 1;
+                    salir = true;
                     break;
                 default:
                     System.err.println("Opción incorrecta");
             }
-        } while (salir != 1);
+            
+            victoria = compruebaVictor(bomba);
+            
+            if ( victoria == false) {
+                infoUs("FIN DEL JUEGO");
+                salir = true;
+            }
+            
+        } while (salir == false &&  victoria == true);
         
 
     }
 
+    public static boolean compruebaVictor(boolean posic){
+        boolean victoria = true;
+        
+        if (posic == true ) {
+            infoUs("BOOOOOOOOOOOOOOOOOM!");
+            victoria = false;
+        }
+        return victoria;
+    }
+    
     public static void ponerBand(int fil, int col, char vis[][], int dim[]) {
         //Posición correcta
         if (correctaSN(fil, col, dim)) {
@@ -268,16 +288,30 @@ public class BuscaMinas {
                 
                 vis[fil][col] = DST;
                 destapar(tab, vis, fil, col + 1, dim);
+                
                 destapar(tab, vis, fil, col - 1, dim);
+                
                 destapar(tab, vis, fil - 1, col, dim);
+                
                 destapar(tab, vis, fil + 1, col, dim);
+                
                 destapar(tab, vis, fil + 1, col + 1, dim);
+                
                 destapar(tab, vis, fil + 1, col - 1, dim);
+                
                 destapar(tab, vis, fil - 1, col + 1, dim);
+                
                 destapar(tab, vis, fil - 1, col + 1, dim);
+                
             } else {
-                System.out.println("Cantidad minas adyacentes");
-                vis[fil][col] = (contBmbAlr(fil, col, tab,dim) + " ").charAt(0);
+                int cant = contBmbAlr(fil, col, tab,dim);
+                String cNum;
+                
+                cNum = String.valueOf(cant);
+                
+                System.out.println(cNum);
+                vis[fil][col] = cNum.charAt(0);
+                
             }
         }
     }
@@ -320,9 +354,9 @@ public class BuscaMinas {
             System.out.printf("%-2d", i);
         }
         System.out.println("");
-        for (int i = 0; i < matriz.length; i++) {
+        for (int i = 1; i < matriz.length; i++) {
             System.out.printf("%-3d|", i);
-            for (int j = 0; j < matriz[0].length; j++) {
+            for (int j = 1; j < matriz[0].length; j++) {
                 if (matriz[i][j] == true) {
                     System.out.print(BMB+"|");
                 }else{
